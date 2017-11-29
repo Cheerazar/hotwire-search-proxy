@@ -19,8 +19,21 @@ app.get('/api/search', cors(corsOptions), ({ query: { where, startDate, endDate 
     .get(`http://api.hotwire.com/v1/search/car?apikey=${API_KEY}&dest=${
       where
     }&startdate=${decodeURIComponent(startDate)}&enddate=${decodeURIComponent(endDate)}&pickuptime=10:00&dropofftime=13:30&format=json`)
-    .then(({ data: { Result, StatusCode, StatusDesc } }) => {
-      res.json({ results: Result, statusCode: StatusCode, statusDesc: StatusDesc });
+    .then(({
+      data: {
+        MetaData, Result, StatusCode, StatusDesc,
+      },
+    }) => {
+      let carTypes;
+      if (MetaData && MetaData.CarMetaData && MetaData.CarMetaData.CarTypes) {
+        carTypes = MetaData.CarMetaData.CarTypes;
+      }
+      res.json({
+        carTypes,
+        results: Result,
+        statusCode: StatusCode,
+        statusDesc: StatusDesc,
+      });
     })
     .catch((err) => {
       res.json({ error: err });
